@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SIGLV · Sistema Integral de Gestión y Logística de Viajes. Catálogo de vuelos, hoteles y actividades, armado de itinerarios y emisión de presupuestos.">
+<title>SIGLV · Sistema Integral de Gestión y Logística de Viajes</title>
+
+<link rel="icon" href="img/logo.png">
+<link rel="stylesheet" href="css/estilos.css">
+<link rel="stylesheet" href="css/propuesta.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body id="body">
+
+<!-- ============================================================
+     MENÚ HAMBURGUESA DESPLEGABLE  (conservado de SIGLV / Proyecto 2)
+     ============================================================ -->
+<div class="menu-trigger" id="menuTrigger" onclick="toggleMenu()" role="button" tabindex="0"
+     aria-label="Abrir menú" aria-expanded="false" aria-controls="overlayMenu">
+  <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+</div>
+
+<nav class="overlay-menu" id="overlayMenu" aria-label="Menú lateral">
+  <button class="close-btn" onclick="toggleMenu()" aria-label="Cerrar menú">&times;</button>
+
+  <!-- SWITCH DÍA / NOCHE -->
+  <div class="theme-switch-wrapper">
+    <label class="theme-switch" for="checkbox">
+      <input type="checkbox" id="checkbox" aria-label="Alternar modo claro u oscuro">
+      <div class="slider round">
+        <span class="sun"><i class="fas fa-sun"></i></span>
+        <span class="moon"><i class="fas fa-moon"></i></span>
+      </div>
+    </label>
+    <p class="switch-label">Modo Claro / Oscuro</p>
+  </div>
+
+  <!-- ZONA PRIVADA (login local; sustituible por sesión PHP) -->
+  <div class="menu-login-zone">
+    <h3>Zona privada del agente</h3>
+    <div id="auth-form-view">
+      <form id="user-form" class="formulario-mini" autocomplete="on">
+        <input type="text"     id="reg-name"  placeholder="Nombre del agente" required>
+        <input type="email"    id="reg-email" placeholder="correo@agencia.com" required>
+        <input type="password" id="reg-pass"  placeholder="Contraseña (mín. 6)" required minlength="6">
+        <button type="submit" class="cta-btn small">Acceder</button>
+      </form>
+      <p class="nota-mini">Demo local con <code>localStorage</code>. En producción se reemplaza por
+        <code>api/login.php</code> + sesión.</p>
+    </div>
+    <div id="user-profile-view" style="display:none; text-align:center;">
+      <p id="display-name" class="lead">Bienvenido</p>
+      <p id="display-email" class="sub-email"></p>
+      <button onclick="cerrarSesion()" class="cta-btn small btn-danger">Salir</button>
+    </div>
+  </div>
+
+  <ul class="menu-links">
+    <li><a href="#" data-goto="propuesta">Nueva propuesta</a></li>
+    <li><a href="#" data-goto="catalogo">Catálogo de servicios</a></li>
+    <li><a href="#" data-goto="cotizaciones">Mis cotizaciones</a></li>
+    <li><a href="#" data-goto="empresa">Acerca de SIGLV</a></li>
+    <li><a href="#" data-goto="contacto">Contacto</a></li>
+  </ul>
+
+  <div class="menu-foot">
+    <span class="badge-dfd">DFD Nivel 1 · 4 procesos</span>
+    <span class="badge-dfd">Almacenes VU · HT · AC · RE · PR</span>
+  </div>
+</nav>
+
+<!-- ============================================================
+     NAVEGACIÓN PRINCIPAL
+     ============================================================ -->
+<nav class="navbar" id="navbar">
+  <div class="logo"><i class="fas fa-paper-plane"></i> SIGLV</div>
+  <ul class="nav-links">
+    <li><button data-goto="inicio"       id="btn-inicio" class="active-btn">Inicio</button></li>
+    <li><button data-goto="catalogo"     id="btn-catalogo">Catálogo</button></li>
+    <li><button data-goto="propuesta"    id="btn-propuesta" class="btn-destacado">Nueva propuesta</button></li>
+    <li><button data-goto="cotizaciones" id="btn-cotizaciones">Cotizaciones</button></li>
+    <li><button data-goto="empresa"      id="btn-empresa">Empresa</button></li>
+    <li><button data-goto="contacto"     id="btn-contacto">Contacto</button></li>
+  </ul>
+</nav>
+
+<!-- ============================================================
+     PANTALLA 1 · INICIO (banner animado + video + planes)
+     ============================================================ -->
+<section id="inicio" class="pantalla activa">
+
+  <!-- BANNER ANIMADO 3D -->
+  <div class="hero-animated">
+    <p class="hero-kicker">Sistema Integral de Gestión y Logística de Viajes</p>
+    <div class="banner-heading">
+      <span class="heading-1">VUELOS</span>
+      <span class="heading-2">HOTELES</span>
+      <span class="heading-3">TOURS</span>
+      <span class="heading-4">PRESUPUESTO</span>
+    </div>
+    <p class="hero-subtitle">Del primer dato de solicitud al presupuesto firmado, en un solo flujo.</p>
+    <div class="hero-cta">
+      <!-- Requisito: "Explorar catálogo" lleva al usuario a Nueva propuesta -->
+      <button class="cta-btn" data-goto="propuesta" id="btn-explorar-catalogo">
+        <i class="fas fa-compass"></i> Explorar catálogo
+      </button>
+      <button class="cta-btn outline" data-goto="empresa">Conocer el sistema</button>
+    </div>
+    <div class="hero-metrics" id="heroMetrics">
+      <div class="metric"><b data-contador="0">0</b><span>Vuelos en VU</span></div>
+      <div class="metric"><b data-contador="0">0</b><span>Hoteles en HT</span></div>
+      <div class="metric"><b data-contador="0">0</b><span>Actividades en AC</span></div>
+      <div class="metric"><b data-contador="0">0</b><span>Tarifas en PR</span></div>
+    </div>
+  </div>
+
+  <!-- LOS 4 PROCESOS DEL DFD -->
+  <div class="mt-large reveal">
+    <h2 class="section-title">El flujo del sistema</h2>
+    <span class="bottom-line"></span>
+    <div class="procesos-grid">
+      <article class="proceso-card">
+        <span class="pnum">1.0</span>
+        <h3>Gestionar vuelo</h3>
+        <p>Captura y normaliza los <em>datos de solicitud</em>, consulta el almacén <b>VU</b> y registra la reserva.</p>
+        <ul><li>1.1 Capturar solicitud</li><li>1.2 Buscar vuelos</li><li>1.3 Seleccionar vuelo</li><li>1.4 Registrar reserva</li></ul>
+      </article>
+      <article class="proceso-card">
+        <span class="pnum">2.0</span>
+        <h3>Gestionar hotel</h3>
+        <p>Filtra por cercanía y seguridad contra el almacén <b>HT</b> y reserva la habitación.</p>
+        <ul><li>2.1 Filtrar por cercanía</li><li>2.2 Filtrar por seguridad</li><li>2.3 Seleccionar hotel</li><li>2.4 Reservar habitación</li></ul>
+      </article>
+      <article class="proceso-card">
+        <span class="pnum">3.0</span>
+        <h3>Gestionar actividades</h3>
+        <p>Busca tours cercanos en <b>AC</b>, verifica cupos y horarios y consolida el itinerario.</p>
+        <ul><li>3.1 Buscar actividades</li><li>3.2 Verificar cupos</li><li>3.3 Seleccionar tours</li><li>3.4 Consolidar itinerario</li></ul>
+      </article>
+      <article class="proceso-card">
+        <span class="pnum">4.0</span>
+        <h3>Emitir presupuesto</h3>
+        <p>Consolida <b>RE</b>, aplica tarifas de <b>PR</b>, calcula impuestos y emite la cotización.</p>
+        <ul><li>4.1 Consolidar reservas</li><li>4.2 Calcular costo</li><li>4.3 Aplicar impuestos</li><li>4.4 Emitir presupuesto</li></ul>
+      </article>
+    </div>
+  </div>
+
+  <!-- GALERÍA CLÁSICA -->
+  <div class="mt-large reveal">
+    <h2 class="section-title">Destinos operados</h2>
+    <span class="bottom-line"></span>
+    <div class="items" id="galeriaDestinos"></div>
+  </div>
+
+  <!-- VIDEOS CON REPRODUCTOR PERSONALIZADO -->
+  <div id="video-section" class="video-container mt-xlarge reveal">
+    <h2 class="section-title">SIGLV en video</h2>
+    <span class="bottom-line"></span>
+
+    <div class="video-wrapper">
+      <video class="video-player" id="videoPrincipal" poster="img/principal.jpg" preload="metadata" playsinline>
+        <source src="img/empresa.mp4" type="video/mp4">
+        Tu navegador no soporta videos HTML5.
+      </video>
+      <div class="controls">
+        <div class="video-bar-wrapper" id="videoBarWrapper"><div class="video-bar" id="videoBar"></div></div>
+        <div class="buttons">
+          <button onclick="playPauseVideo()" aria-label="Reproducir o pausar"><i class="fas fa-play-circle" id="videoIcon"></i></button>
+          <button onclick="retrocederVideo()" aria-label="Retroceder 10 segundos"><i class="fas fa-rotate-left"></i></button>
+          <button onclick="silenciarVideo()" aria-label="Silenciar"><i class="fas fa-volume-high" id="videoMute"></i></button>
+          <span class="video-time" id="videoTime">00:00 / 00:00</span>
+          <button onclick="pantallaCompletaVideo()" aria-label="Pantalla completa" class="right-ctrl"><i class="fas fa-expand"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de videos: se alimenta de datos.js → escalable a tabla `video` en MySQL -->
+    <div class="video-playlist" id="videoPlaylist"></div>
+
+    <div class="video-quote">
+      <i class="fas fa-quote-left"></i>
+      <p>"Un itinerario bien armado es un presupuesto que se defiende solo."</p>
+      <i class="fas fa-quote-right"></i>
+    </div>
+  </div>
+
+  <!-- PLANES -->
+  <div class="pricing-section mt-xlarge reveal">
+    <h2 class="section-title">Planes de servicio</h2>
+    <span class="bottom-line"></span>
+    <div class="pricing-cards">
+      <div class="card">
+        <div class="card-header free">CONSULTA</div>
+        <div class="price">$0</div>
+        <ul><li>Acceso al catálogo</li><li>Comparador de vuelos</li><li>Presupuesto estimado</li></ul>
+        <button class="cta-btn outline" data-goto="propuesta">Seleccionar</button>
+      </div>
+      <div class="card featured">
+        <div class="card-header standard">INTEGRAL</div>
+        <div class="price">$499</div>
+        <ul><li>Itinerario completo</li><li>Reservas confirmadas</li><li>Precios bloqueados (PR)</li><li>Cotización en PDF</li></ul>
+        <button class="cta-btn" data-goto="propuesta">Seleccionar</button>
+      </div>
+      <div class="card">
+        <div class="card-header basic">BÁSICO</div>
+        <div class="price">$199</div>
+        <ul><li>Vuelo + hotel</li><li>Una actividad incluida</li><li>Vigencia 15 días</li></ul>
+        <button class="cta-btn" data-goto="propuesta">Seleccionar</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PANTALLA 2 · CATÁLOGO (almacenes VU / HT / AC / PR)
+     ============================================================ -->
+<section id="catalogo" class="pantalla">
+  <div class="container">
+    <h2 class="section-title">Catálogo de servicios</h2>
+    <span class="bottom-line"></span>
+    <p class="lead-centrado">Inventario vigente de los almacenes de datos del sistema.
+      Cada registro es una fila de su tabla en MySQL.</p>
+
+    <div class="cat-toolbar">
+      <div class="cat-tabs" id="catTabs"></div>
+      <div class="cat-busqueda">
+        <i class="fas fa-magnifying-glass"></i>
+        <input type="search" id="catBuscar" placeholder="Buscar en el catálogo…" aria-label="Buscar en el catálogo">
+      </div>
+    </div>
+
+    <div id="catContenido" class="cat-contenido"></div>
+
+    <div class="cta-catalogo">
+      <p>¿Listo para armar el paquete con estos servicios?</p>
+      <button class="cta-btn" data-goto="propuesta"><i class="fas fa-compass"></i> Explorar catálogo</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PANTALLA 3 · NUEVA PROPUESTA (wizard DFD 1.0 → 4.0)
+     ============================================================ -->
+<section id="propuesta" class="pantalla">
+  <div class="container-ancho">
+    <div class="prop-topbar no-print">
+      <div>
+        <p class="crumb">Agente de viajes · construcción de propuesta</p>
+        <h2 id="propTitulo">Nueva propuesta</h2>
+      </div>
+      <div class="prop-acciones">
+        <button class="cta-btn outline small" onclick="reiniciarPropuesta()"><i class="fas fa-rotate"></i> Reiniciar</button>
+        <button class="cta-btn small" onclick="exportarPDF()"><i class="fas fa-file-pdf"></i> Exportar a PDF</button>
+      </div>
+    </div>
+
+    <!-- Indicador de pasos -->
+    <div class="pasos no-print" id="propPasos"></div>
+
+    <!-- Cuerpo del wizard -->
+    <div id="propCuerpo" class="prop-cuerpo"></div>
+
+    <!-- Resumen flotante del paquete -->
+    <aside class="resumen-flotante no-print" id="resumenFlotante" aria-live="polite"></aside>
+  </div>
+</section>
+
+<!-- ============================================================
+     PANTALLA 4 · COTIZACIONES EMITIDAS
+     ============================================================ -->
+<section id="cotizaciones" class="pantalla">
+  <div class="container">
+    <h2 class="section-title">Cotizaciones emitidas</h2>
+    <span class="bottom-line"></span>
+    <p class="lead-centrado">Folios generados por el proceso 4.4 · Emitir presupuesto.</p>
+    <div id="listaCotizaciones" class="lista-cotizaciones"></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PANTALLA 5 · EMPRESA + GALERÍA MOSAICO + TESTIMONIOS
+     ============================================================ -->
+<section id="empresa" class="pantalla">
+  <div class="container">
+    <h2 class="section-title">Acerca de SIGLV</h2>
+    <span class="bottom-line"></span>
+    <div class="empresa-grid">
+      <img src="img/test-bg.jpg" alt="Operación de viajes SIGLV" class="img-responsive" loading="lazy">
+      <div class="texto-empresa">
+        <p>SIGLV es el sistema interno con el que la agencia transforma una solicitud de viaje en una
+          cotización formal. Opera sobre cuatro procesos y cinco almacenes de datos definidos en el
+          diagrama de flujo del sistema.</p>
+        <p>Cada paso del armado deja rastro: la reserva se escribe en <b>RE</b>, la tarifa se congela en
+          <b>PR</b> y el presupuesto se emite con folio y vigencia, de modo que el precio ofrecido al
+          cliente siempre es reproducible.</p>
+        <div class="empresa-chips">
+          <span><i class="fas fa-plane"></i> VU · Vuelos</span>
+          <span><i class="fas fa-hotel"></i> HT · Hoteles</span>
+          <span><i class="fas fa-mountain-sun"></i> AC · Actividades</span>
+          <span><i class="fas fa-bookmark"></i> RE · Reservas</span>
+          <span><i class="fas fa-tags"></i> PR · Precios bloqueados</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GALERÍA MOSAICO DORADA -->
+    <div class="mt-xlarge">
+      <h3 class="section-title gold-title">Colección de experiencias</h3>
+      <span class="bottom-line gold-line"></span>
+      <div class="mosaico-grid">
+        <div class="mosaico-item" id="m-apartamento"><img src="img/items/item1.jpg" alt="Castillos de Europa" loading="lazy"><div class="superpuesto blanco"><h3>Castillos de Europa</h3></div></div>
+        <div class="mosaico-item" id="m-casa1"><img src="img/recomendados/recomendado1.jpg" alt="Lagos y montaña" loading="lazy"><div class="superpuesto"><h3>Lagos y montaña</h3></div></div>
+        <div class="mosaico-item" id="m-casa2"><img src="img/recomendados/recomendado2.jpg" alt="Rutas de desierto" loading="lazy"><div class="superpuesto"><h3>Desierto</h3></div></div>
+        <div class="mosaico-item" id="m-casa3"><img src="img/items/item2.jpg" alt="Pueblos costeros" loading="lazy"><div class="superpuesto"><h3>Pueblos costeros</h3></div></div>
+        <div class="mosaico-item" id="m-casa4"><img src="img/recomendados/recomendado4.jpg" alt="Patrimonio" loading="lazy"><div class="superpuesto"><h3>Patrimonio</h3></div></div>
+        <div class="mosaico-item" id="m-casa6"><img src="img/items/item3.jpg" alt="Ciudades de noche" loading="lazy"><div class="superpuesto blanco"><h3>Ciudades de noche</h3></div></div>
+        <div class="mosaico-item" id="m-casa5"><img src="img/items/item7.jpg" alt="Rutas en tren" loading="lazy"><div class="superpuesto"><h3>Rutas en tren</h3></div></div>
+        <div class="mosaico-item" id="m-casa7"><img src="img/items/item8.jpg" alt="Naturaleza" loading="lazy"><div class="superpuesto"><h3>Naturaleza</h3></div></div>
+        <div class="mosaico-item" id="m-casa8"><img src="img/items/item5.jpg" alt="Playa" loading="lazy"><div class="superpuesto"><h3>Playa</h3></div></div>
+      </div>
+    </div>
+
+    <!-- TESTIMONIOS CON SLIDER -->
+    <div class="testimonials-section mt-xlarge">
+      <h3 class="section-title">Lo que dicen nuestros clientes</h3>
+      <span class="bottom-line"></span>
+      <div class="testimonial-slider-container">
+        <div class="testimonial-track" id="testimonialTrack"></div>
+        <button class="slider-btn prev" onclick="moveSlide(-1)" aria-label="Anterior">&#10094;</button>
+        <button class="slider-btn next" onclick="moveSlide(1)"  aria-label="Siguiente">&#10095;</button>
+        <div class="slider-dots" id="sliderDots"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PANTALLA 6 · CONTACTO
+     ============================================================ -->
+<section id="contacto" class="pantalla">
+  <div class="container contacto-container">
+    <h2 class="section-title">Contáctanos</h2>
+    <span class="bottom-line"></span>
+    <form class="formulario" id="formContacto" novalidate>
+      <label for="ct-nombre">Nombre</label>
+      <input type="text" id="ct-nombre" placeholder="Tu nombre completo" required>
+      <label for="ct-email">Email</label>
+      <input type="email" id="ct-email" placeholder="tu@email.com" required>
+      <label for="ct-asunto">Asunto</label>
+      <select id="ct-asunto">
+        <option>Cotización de paquete</option>
+        <option>Seguimiento de reserva</option>
+        <option>Soporte del sistema</option>
+      </select>
+      <label for="ct-msg">Mensaje</label>
+      <textarea id="ct-msg" rows="4" placeholder="¿En qué podemos ayudarte?" required></textarea>
+      <button type="submit" class="cta-btn">Enviar mensaje</button>
+      <p class="nota-mini">El envío se procesa en <code>api/contacto.php</code> cuando el sistema corre sobre PHP.</p>
+    </form>
+    <div class="info-contacto">
+      <div><h3><i class="fas fa-location-dot"></i> Oficina</h3><p>Av. Reforma 222, Ciudad de México</p></div>
+      <div><h3><i class="fas fa-phone"></i> Teléfono</h3><p>(55) 1234 5678</p></div>
+      <div><h3><i class="fas fa-clock"></i> Horario</h3><p>Lun a Sáb · 9:00 – 19:00</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div>
+      <p class="footer-logo"><i class="fas fa-paper-plane"></i> SIGLV</p>
+      <p class="xs">Sistema Integral de Gestión y Logística de Viajes.</p>
+    </div>
+    <div>
+      <p class="footer-t">Módulos</p>
+      <a href="#" data-goto="catalogo">Catálogo</a>
+      <a href="#" data-goto="propuesta">Nueva propuesta</a>
+      <a href="#" data-goto="cotizaciones">Cotizaciones</a>
+    </div>
+    <div>
+      <p class="footer-t">Almacenes</p>
+      <span class="xs">VU · Vuelos</span><span class="xs">HT · Hoteles</span>
+      <span class="xs">AC · Actividades</span><span class="xs">RE · Reservas</span>
+      <span class="xs">PR · Precios bloqueados</span>
+    </div>
+  </div>
+  <p class="copy">SIGLV © 2026 · Todos los derechos reservados</p>
+</footer>
+
+<!-- Botón volver arriba -->
+<button class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Volver arriba">
+  <i class="fas fa-chevron-up"></i>
+</button>
+
+<!-- Aviso flotante -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- ============================================================
+     DOCUMENTO IMPRIMIBLE · se arma en memoria y se usa para el PDF
+     ============================================================ -->
+<div id="documentoPDF" class="documento-pdf" aria-hidden="true"></div>
+
+<script src="js/datos.js"></script>
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/propuesta.js"></script>
+</body>
+</html>
